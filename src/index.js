@@ -12,8 +12,11 @@ async function main() {
   const isScheduleTime = currentHour === 16;
 
   if (isScheduleTime) {
+    // At 16:00, send both updates and tomorrow's schedule
+    await checkForUpdates();
     await sendTomorrowSchedule();
   } else {
+    // At other times, only check for updates
     await checkForUpdates();
   }
 }
