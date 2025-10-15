@@ -1,0 +1,18 @@
+const Librus = require('librus-api');
+
+async function test() {
+  const client = new Librus();
+  await client.authorize('12112456', 'rihce8-joqpof-devXuk');
+  const timetable = await client.calendar.getTimetable();
+  console.log(JSON.stringify(timetable, null, 2));
+}
+
+test();
+
+^x
+^X
+A
+c
+clear
+exit
+
