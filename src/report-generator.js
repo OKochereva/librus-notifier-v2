@@ -25,28 +25,28 @@ class ReportGenerator {
     let section = `👤 *${accountName.toUpperCase()}*\n`;
     section += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-    if (updates.newGrades.length > 0) {
+    if (updates.newGrades && updates.newGrades.length > 0) {
       section += `📊 *NOWE OCENY (${updates.newGrades.length})*\n\n`;
       for (const grade of updates.newGrades) {
         section += this.formatGrade(grade);
       }
     }
 
-    if (updates.newMessages.length > 0) {
+    if (updates.newMessages && updates.newMessages.length > 0) {
       section += `📨 *NOWE WIADOMOŚCI (${updates.newMessages.length})*\n\n`;
       for (const message of updates.newMessages) {
         section += this.formatMessage(message);
       }
     }
 
-    if (updates.newAnnouncements.length > 0) {
+    if (updates.newAnnouncements && updates.newAnnouncements.length > 0) {
       section += `📢 *NOWE OGŁOSZENIA (${updates.newAnnouncements.length})*\n\n`;
       for (const announcement of updates.newAnnouncements) {
         section += this.formatAnnouncement(announcement);
       }
     }
 
-    if (updates.scheduleChanges.length > 0) {
+    if (updates.scheduleChanges && updates.scheduleChanges.length > 0) {
       section += `📅 *ZMIANY W PLANIE*\n\n`;
       for (const change of updates.scheduleChanges) {
         section += `   • ${change.description}\n`;
@@ -54,14 +54,14 @@ class ReportGenerator {
       section += '\n';
     }
 
-    if (updates.newAttendance.length > 0) {
+    if (updates.newAttendance && updates.newAttendance.length > 0) {
       section += `✅ *NOWE FREKWENCJE (${updates.newAttendance.length})*\n\n`;
       for (const att of updates.newAttendance) {
         section += this.formatAttendance(att);
       }
     }
 
-    if (updates.newCalendarEvents.length > 0) {
+    if (updates.newCalendarEvents && updates.newCalendarEvents.length > 0) {
       section += `📅 *NOWE WYDARZENIA (${updates.newCalendarEvents.length})*\n\n`;
       for (const event of updates.newCalendarEvents) {
         section += this.formatCalendarEvent(event);
@@ -145,6 +145,30 @@ class ReportGenerator {
   static formatAttendance(att) {
     let text = `   • ${this.formatDate(att.date)} - Lekcja ${att.lessonNo}: `;
     text += `${att.type} (${att.subject})\n`;
+    return text;
+  }
+
+  static formatCalendarEvent(event) {
+    let text = `   📌 *${event.title}*\n`;
+    if (event.description) {
+      text += `   ${event.description}\n`;
+    }
+    if (event.dateFrom) {
+      text += `   Od: ${this.formatDate(event.dateFrom)}\n`;
+    }
+    if (event.dateTo) {
+      text += `   Do: ${this.formatDate(event.dateTo)}\n`;
+    }
+    if (event.date && !event.dateFrom) {
+      text += `   Data: ${this.formatDate(event.date)}\n`;
+    }
+    if (event.category) {
+      text += `   Kategoria: ${event.category}\n`;
+    }
+    if (event.addedBy) {
+      text += `   Dodał: ${event.addedBy}\n`;
+    }
+    text += '\n';
     return text;
   }
 
