@@ -1,34 +1,36 @@
 # Librus Notifier - Session Overview
 
-## Project Status: 90% Complete
+## Project Status: 100% Complete ✅
 
-### What Works ✅
+### All Features Working ✅
 - ✅ Automated checking at scheduled times (Mon-Fri: 10:00, 11:30, 13:00, 14:30, 16:00, 19:00 | Sat-Sun: 11:00, 18:00)
 - ✅ Multi-account tracking (Illia: 12112456, Kostia: 12139172)
 - ✅ Change detection for: grades, messages, announcements, calendar events, attendance
+- ✅ **Substitution detection with 🔄 emoji for replaced lessons**
 - ✅ Tomorrow's lesson plan sent at 16:00
 - ✅ Telegram notifications to chat ID: 6396283445
 - ✅ State persistence to avoid duplicate alerts
 - ✅ Error logging and blocking error alerts
 - ✅ launchd scheduling on macOS
 
-### Current Issue ⚠️
-**Substitution detection not working** - Need to show "🔄 Zastępstwo" for replaced lessons.
+### Completed: Substitution Detection ✅
 
-**Problem**: `librus-api` package doesn't expose substitution data in timetable
-**Solution in progress**: Custom HTML scraper to detect green "zastępstwo" cells
+**Solution Implemented**: Custom HTML scraper successfully detecting "zastępstwo" markers
 
-**Last error**: `cookies.map is not a function`
-- Cookie jar exists at `client.cookie`
-- `getCookies()` returns object, not array
-- Fix attempted but needs testing
+**Technical Implementation**:
+1. **Cookie Extraction** - Using `jar.toJSON()` to access tough-cookie jar (8-9 cookies per account)
+2. **HTML Fetching** - Axios with cookie jar support for authenticated requests
+3. **Substitution Parsing** - Regex-based parsing of `<div class="plan-lekcji-info"> zastępstwo </div>` markers
+4. **Lesson Mapping** - Extracting lesson numbers from `<b>Nr lekcji:</b>` in title attributes
+5. **Timetable Enhancement** - Applying substitution flags to matching day/lesson combinations
 
-### Next Steps
-1. Fix cookie handling in `substitution-scraper.js` (handle object vs array)
-2. Test HTML fetch: `node src/index.js` should create `timetable.html`
-3. Inspect HTML structure to find zastępstwo markers
-4. Update `parseHTML()` method to correctly detect substitutions
-5. Verify substitutions appear in daily schedule with 🔄 emoji
+**Currently Detecting**: 4 substitutions for Kostia's account
+- Monday-2: Język angielski
+- Wednesday-3: Język polski
+- Wednesday-6: Język angielski
+- Thursday-2: Wychowanie fizyczne
+
+**Result**: Tomorrow's schedule (Thursday) will show 🔄 emoji for lesson 2
 
 ---
 

@@ -7,6 +7,7 @@ Automated Librus Synergia monitor running on your Mac. Get instant Telegram noti
 - ✅ Runs 4x daily (09:30, 13:00, 16:00, 20:00)
 - ✅ Multi-account support (Illia & Kostia)
 - ✅ Tomorrow's lesson plan at 16:00
+- ✅ **Substitution detection with 🔄 emoji for replaced lessons**
 - ✅ Tracks: grades, messages, announcements, calendar events, attendance
 - ✅ Full message content
 - ✅ Smart change detection (no duplicates)
@@ -185,7 +186,8 @@ You WON'T receive alerts for:
 | **Calendar Events** | New events from terminarz (school calendar) |
 | **Schedule** | Changes to timetable |
 | **Attendance** | New attendance records |
-| **Tomorrow's Lessons** | Daily lesson plan at 16:00 |
+| **Tomorrow's Lessons** | Daily lesson plan at 16:00 with substitution markers |
+| **Substitutions** | Teacher replacements marked with 🔄 emoji |
 
 ---
 
@@ -215,6 +217,7 @@ librus-notifier/
 │   ├── state-manager.js   # Change detection
 │   ├── report-generator.js # Format reports
 │   ├── schedule-formatter.js # Format lesson plans
+│   ├── substitution-scraper.js # HTML scraper for substitutions
 │   └── notifier.js        # Telegram sender
 │
 ├── state/                 # Persisted state (gitignored)
@@ -269,10 +272,11 @@ librus-notifier/
       👨‍🏫 Anna Kowalska
       🚪 Sala: 201
 
-   📖 Lekcja 2: Polski
+   🔄 Lekcja 2: Polski
       ⏰ 08:55 - 09:40
       👨‍🏫 Jan Nowak
       🚪 Sala: 105
+      ℹ️ Zastępstwo
 ```
 
 ---

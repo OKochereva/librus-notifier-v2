@@ -9,8 +9,7 @@ const logger = require('./logger');
 async function main() {
   // Check if this is the 16:00 schedule run
   const currentHour = new Date().getHours();
-  //const isScheduleTime = currentHour === 16;
-  const isScheduleTime = true; //for testing
+  const isScheduleTime = currentHour === 16;
 
   if (isScheduleTime) {
     await sendTomorrowSchedule();
