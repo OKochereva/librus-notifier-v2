@@ -4,7 +4,7 @@ Automated Librus Synergia monitor running on your Mac. Get instant Telegram noti
 
 ## ✨ Features
 
-- ✅ Runs 4x daily (09:30, 13:00, 16:00, 20:00)
+- ✅ Runs by schedule (Monday-Friday 10:00, 11:30, 13:00, 14:30, 16:00, 19:00; Saturday-Sunday 11:00, 18:00)
 - ✅ Multi-account support (Illia & Kostia)
 - ✅ Tomorrow's lesson plan at 16:00
 - ✅ **Substitution detection with 🔄 emoji for replaced lessons**

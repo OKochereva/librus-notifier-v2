@@ -84,15 +84,9 @@ class StateManager {
       a => !previousAnnouncementIds.has(a.id)
     );
 
-    // Detect schedule changes
-    const previousScheduleStr = JSON.stringify(previousData.schedule);
-    const currentScheduleStr = JSON.stringify(currentData.schedule);
-    if (previousScheduleStr !== currentScheduleStr && currentData.schedule.length > 0) {
-      changes.scheduleChanges = [{
-        type: 'modified',
-        description: 'Plan lekcji został zaktualizowany'
-      }];
-    }
+    // Only track non-schedule changes during regular updates
+    // Schedule updates are handled separately at 16:00
+    changes.scheduleChanges = [];
 
     // Find new attendance records
     const previousAttendanceIds = new Set(previousData.attendance.map(a => a.id));
