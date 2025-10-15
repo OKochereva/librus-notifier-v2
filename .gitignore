@@ -8,3 +8,4 @@ logs/*.log
 *.log
 .idea
 timetable.html
+/$DEFAULT_DIR/
