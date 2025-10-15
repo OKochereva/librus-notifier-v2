@@ -65,32 +65,75 @@ class LibrusClient {
     try {
       const data = await this.client.info.getGrades();
       const grades = [];
-      
-      // Extract grades from the nested structure
-      if (data && data.grades) {
-        for (const subject of Object.values(data.grades)) {
-          if (Array.isArray(subject)) {
-            for (const grade of subject) {
-              grades.push({
-                id: grade.id || `${grade.addDate}_${grade.grade}`,
-                subject: grade.category?.name || grade.title || 'Unknown',
-                value: grade.grade,
-                category: grade.category?.name || grade.title,
-                weight: grade.weight || grade.category?.weight,
-                date: grade.addDate,
-                teacher: grade.teacher || '',
-                comment: grade.comments || grade.comment || ''
-              });
+
+      // The API returns an array of subjects, each with semester data
+      if (Array.isArray(data)) {
+        logger.info(`Processing ${data.length} subjects for grades`);
+
+        for (const subject of data) {
+          const subjectName = subject.name || 'Unknown';
+
+          // Each subject has a semester array
+          if (Array.isArray(subject.semester)) {
+            for (const semesterData of subject.semester) {
+              // Each semester has a grades array
+              if (Array.isArray(semesterData.grades)) {
+                for (const grade of semesterData.grades) {
+                  // Parse the info field to extract details
+                  const info = this.parseGradeInfo(grade.info);
+
+                  grades.push({
+                    id: grade.id,
+                    subject: subjectName,
+                    value: grade.value,
+                    category: info.category || 'Unknown',
+                    weight: info.weight || 'Unknown',
+                    date: info.date || 'Unknown',
+                    teacher: info.teacher || '',
+                    comment: info.comment || ''
+                  });
+                }
+              }
             }
           }
         }
       }
-      
+
+      logger.info(`Total grades extracted: ${grades.length}`);
       return grades;
     } catch (error) {
       logger.warn(`Failed to fetch grades: ${error.message}`);
+      logger.error(`Stack trace: ${error.stack}`);
       return [];
     }
+  }
+
+  parseGradeInfo(infoString) {
+    if (!infoString) return {};
+
+    const info = {};
+
+    // Extract category: "Kategoria: kartkówka"
+    const categoryMatch = infoString.match(/Kategoria:\s*(.+?)(?:\n|$)/);
+    if (categoryMatch) info.category = categoryMatch[1].trim();
+
+    // Extract date: "Data: 2025-10-08 (śr.)"
+    const dateMatch = infoString.match(/Data:\s*(.+?)(?:\n|$)/);
+    if (dateMatch) info.date = dateMatch[1].trim();
+
+    // Extract teacher: "Nauczyciel: Moździerz Tomasz"
+    const teacherMatch = infoString.match(/Nauczyciel:\s*(.+?)(?:\n|$)/);
+    if (teacherMatch) info.teacher = teacherMatch[1].trim();
+
+    // Extract weight: "Waga: 5"
+    const weightMatch = infoString.match(/Waga:\s*(.+?)(?:\n|$)/);
+    if (weightMatch) info.weight = weightMatch[1].trim();
+
+    // Extract comment (everything after "Komentarz:")
+    const commentMatch = infoString.match(/Komentarz:\s*(.+)$/s);
+    if (commentMatch) info.comment = commentMatch[1].trim();
+
+    return info;
   }
 
   async fetchMessages() {
