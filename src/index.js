@@ -3,44 +3,93 @@ const LibrusClient = require('./librus-client');
 const StateManager = require('./state-manager');
 const ReportGenerator = require('./report-generator');
 const ScheduleFormatter = require('./schedule-formatter');
+const UpcomingEventsFormatter = require('./upcoming-events-formatter');
 const Notifier = require('./notifier');
 const logger = require('./logger');
 
 async function main() {
-  // Check if this is the 16:00 schedule run
-  const currentHour = new Date().getHours();
-  const isScheduleTime = currentHour === 16;
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const currentDay = now.getDay(); // 0=Sunday, 1=Monday, etc.
 
+  // Determine what to run based on time
+  const isScheduleTime = currentHour === 16; // 16:00 - tomorrow's timetable
+  const isReminderTime =
+    (currentHour === 14 && currentMinute === 30 && currentDay >= 1 && currentDay <= 5) || // 14:30 Mon-Fri
+    (currentHour === 11 && currentMinute === 0 && currentDay === 0); // 11:00 Sunday
+
+  // Always check for updates
+  await checkForUpdates();
+
+  // Send tomorrow's schedule at 16:00
   if (isScheduleTime) {
-    // At 16:00, send both updates and tomorrow's schedule
-    await checkForUpdates();
     await sendTomorrowSchedule();
-  } else {
-    // At other times, only check for updates
-    await checkForUpdates();
   }
+
+  // Send upcoming events reminder at 14:30 (Mon-Fri) and 11:00 (Sunday)
+  if (isReminderTime) {
+    await sendUpcomingEventsReminder();
+  }
+}
+
+async function sendUpcomingEventsReminder() {
+  logger.info('=== Sending upcoming events reminder ===');
+
+  const notifier = new Notifier(config);
+  const accountsWithCalendar = [];
+
+  for (const account of config.accounts) {
+    try {
+      const client = new LibrusClient(account.username, account.password);
+
+      await client.login();
+      const calendar = await client.fetchCalendar();
+
+      accountsWithCalendar.push({
+        name: account.name,
+        calendar: calendar
+      });
+
+    } catch (error) {
+      logger.error(`Error fetching calendar for ${account.name}: ${error.message}`);
+    }
+  }
+
+  if (accountsWithCalendar.length > 0) {
+    const reminderReport = UpcomingEventsFormatter.formatUpcomingEvents(accountsWithCalendar, 2);
+
+    try {
+      await notifier.send(reminderReport);
+      logger.info('Upcoming events reminder sent successfully');
+    } catch (error) {
+      logger.error(`Failed to send upcoming events reminder: ${error.message}`);
+    }
+  }
+
+  logger.info('=== Upcoming events reminder completed ===\n');
 }
 
 async function sendTomorrowSchedule() {
   logger.info('=== Sending tomorrow schedule ===');
-  
+
   const notifier = new Notifier(config);
   const scheduleReports = [];
 
   for (const account of config.accounts) {
     try {
       const client = new LibrusClient(account.username, account.password);
-      
+
       await client.login();
       const timetableData = await client.fetchSchedule();
-      
+
       const scheduleReport = ScheduleFormatter.formatTomorrowSchedule(
         account.name,
         timetableData
       );
-      
+
       scheduleReports.push(scheduleReport);
-      
+
     } catch (error) {
       logger.error(`Error fetching schedule for ${account.name}: ${error.message}`);
       scheduleReports.push(`❌ Błąd przy pobieraniu planu dla ${account.name}`);
@@ -49,7 +98,7 @@ async function sendTomorrowSchedule() {
 
   if (scheduleReports.length > 0) {
     const fullReport = scheduleReports.join('\n');
-    
+
     try {
       await notifier.send(fullReport);
       logger.info('Tomorrow schedule sent successfully');
