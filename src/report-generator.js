@@ -139,13 +139,19 @@ class ReportGenerator {
   }
 
   static formatAnnouncement(announcement) {
-    let text = `   *${announcement.title}*\n`;
-    text += `   Data: ${this.formatDate(announcement.date)}\n`;
-    if (announcement.author) {
-      text += `   Autor: ${announcement.author}\n`;
+    // Ensure we have required fields with fallbacks
+    const title = announcement.title || announcement.subject || 'Ogłoszenie';
+    const date = announcement.date || announcement.startDate || 'Brak daty';
+    const author = announcement.author || announcement.user || '';
+
+    let text = `   *${title}*\n`;
+    text += `   📅 Data: ${this.formatDate(date)}\n`;
+    if (author) {
+      text += `   👤 Autor: ${author}\n`;
     }
     text += `\n`;
-    const content = announcement.content.replace(/<[^>]*>/g, '').trim();
+
+    const content = (announcement.content || announcement.body || '').replace(/<[^>]*>/g, '').trim();
     if (content) {
       const lines = content.split('\n');
       for (const line of lines) {

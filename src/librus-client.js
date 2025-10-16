@@ -161,6 +161,22 @@ class LibrusClient {
     return `custom_${Math.abs(hash)}`;
   }
 
+  createAnnouncementId(announcementData) {
+    // Create a unique identifier based on announcement properties
+    const { title, content, date, author } = announcementData;
+    const dataString = `${title}-${date}-${author}-${content.substring(0, 100)}`;
+
+    // Simple hash function to create a unique ID
+    let hash = 0;
+    for (let i = 0; i < dataString.length; i++) {
+      const char = dataString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+
+    return `ann_${Math.abs(hash)}`;
+  }
+
   async fetchMessages() {
     try {
       const INBOX_FOLDER = 5; // Standard inbox folder ID
@@ -236,16 +252,47 @@ class LibrusClient {
   async fetchAnnouncements() {
     try {
       const announcements = await this.client.inbox.listAnnouncements();
-      
-      if (!Array.isArray(announcements)) return [];
-      
-      return announcements.map(ann => ({
-        id: ann.id,
-        title: ann.subject || ann.title,
-        content: ann.content || ann.body || '',
-        date: ann.date || ann.startDate,
-        author: ann.author || ann.user || ''
-      }));
+
+      if (!Array.isArray(announcements)) {
+        logger.warn('Announcements API returned non-array data');
+        return [];
+      }
+
+      const processed = announcements.map(ann => {
+        const title = ann.subject || ann.title || '';
+        const content = ann.content || ann.body || '';
+        const date = ann.date || ann.startDate || '';
+        const author = ann.author || ann.user || '';
+
+        // Create a unique identifier for announcements without IDs
+        const uniqueId = ann.id || this.createAnnouncementId({
+          title,
+          content,
+          date,
+          author
+        });
+
+        const processed = {
+          id: uniqueId,
+          title,
+          content,
+          date,
+          author
+        };
+
+        // Log if we're missing critical fields
+        if (!processed.title) {
+          logger.warn(`Announcement ${uniqueId} missing title. Raw fields: ${Object.keys(ann).join(', ')}`);
+        }
+        if (!processed.date) {
+          logger.warn(`Announcement ${uniqueId} missing date. Raw fields: ${Object.keys(ann).join(', ')}`);
+        }
+
+        return processed;
+      });
+
+      logger.info(`Fetched ${processed.length} announcements`);
+      return processed;
     } catch (error) {
       logger.warn(`Failed to fetch announcements: ${error.message}`);
       return [];

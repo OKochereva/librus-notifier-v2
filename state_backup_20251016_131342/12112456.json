@@ -1,0 +1,586 @@
+{
+  "timestamp": "2025-10-16T11:05:19.787Z",
+  "grades": [
+    {
+      "id": "custom_1604331029",
+      "subject": "Edukacja matematyczna",
+      "value": "6",
+      "category": "Unknown",
+      "weight": "Unknown",
+      "date": "2025-10-16 (czw.)",
+      "teacher": "Sokół Bernadetta",
+      "comment": "Kartkówka"
+    },
+    {
+      "id": "custom_1264977763",
+      "subject": "Edukacja muzyczna",
+      "value": "6",
+      "category": "Unknown",
+      "weight": "Unknown",
+      "date": "2025-10-14 (wt.)",
+      "teacher": "Sokół Bernadetta",
+      "comment": "Panie Janie - gra na cymbałkach"
+    },
+    {
+      "id": "custom_1262187790",
+      "subject": "Edukacja polonistyczna",
+      "value": "6",
+      "category": "Unknown",
+      "weight": "Unknown",
+      "date": "2025-10-03 (pt.)",
+      "teacher": "Sokół Bernadetta",
+      "comment": "Alfabet"
+    },
+    {
+      "id": "custom_451284738",
+      "subject": "Edukacja polonistyczna",
+      "value": "6",
+      "category": "Unknown",
+      "weight": "Unknown",
+      "date": "2025-10-03 (pt.)",
+      "teacher": "Sokół Bernadetta",
+      "comment": "Recytacja wiersza"
+    }
+  ],
+  "messages": [
+    {
+      "id": 3235738,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Kolejne spotkanie dla rodziców z programu  Kot w tarapatach",
+      "body": "",
+      "date": "2025-10-14 19:38:09",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 3224863,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Podziękowanie",
+      "body": "",
+      "date": "2025-10-14 16:08:41",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 3109011,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Dzień Edukacji Narodowej",
+      "body": "",
+      "date": "2025-10-12 15:27:09",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 2805892,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Planetarium",
+      "body": "",
+      "date": "2025-10-07 15:43:33",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 2804366,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Międzynarodowe Centrum Kultury - zmiana terminu warsztatów",
+      "body": "",
+      "date": "2025-10-07 15:25:43",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 2776364,
+      "from": "Kozioł Renata (Kozioł Renata)",
+      "subject": "Napisz bajkę- konkurs literacki z Wydawnictwa Wrażliwego",
+      "body": "",
+      "date": "2025-10-07 11:47:42",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 2479026,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Międzynarodowe Centrum Kultury",
+      "body": "",
+      "date": "2025-10-02 18:18:02",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 2349758,
+      "from": "Sarkowicz Ewa (Sarkowicz Ewa)",
+      "subject": "Fluoryzacja",
+      "body": "",
+      "date": "2025-10-01 12:36:22",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 2275520,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Rowerowy październik",
+      "body": "",
+      "date": "2025-09-30 17:46:56",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 2013235,
+      "from": "Krawiec Marisa (Ostenda Klaudia)",
+      "subject": "Stołówka Szkolna - PAŹDZIERNIK 2025 - kontakt pod nr tel. 503...",
+      "body": "",
+      "date": "2025-09-26 19:57:36",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 1957946,
+      "from": "Poznańska Anna (Poznańska Anna)",
+      "subject": "Budżet Obywatelski",
+      "body": "",
+      "date": "2025-09-26 09:05:46",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 1718155,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Dzień jabłka",
+      "body": "",
+      "date": "2025-09-23 19:02:33",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 1679747,
+      "from": "Kozioł Renata (Kozioł Renata)",
+      "subject": "Najlepszy Czytelnik.",
+      "body": "",
+      "date": "2025-09-23 12:25:35",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 1591165,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Legitymacje",
+      "body": "",
+      "date": "2025-09-22 15:43:56",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 1373553,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Kot w tarapatach- cykl wykładowo- warsztatowy dla rodziców",
+      "body": "",
+      "date": "2025-09-18 20:22:55",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 1042970,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Wtorkowe obiady",
+      "body": "",
+      "date": "2025-09-15 15:27:00",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 1013158,
+      "from": "Krawiec Marisa (Ostenda Klaudia)",
+      "subject": "Stołówka Szkolna - WRZESIEŃ 2025 - PRZYPOMNIENIE.",
+      "body": "",
+      "date": "2025-09-15 11:45:27",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 646586,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Obiady",
+      "body": "",
+      "date": "2025-09-09 18:01:25",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 555869,
+      "from": "Sarkowicz Ewa (Sarkowicz Ewa)",
+      "subject": "Dziękujemy za i prosimy o Współpracę.",
+      "body": "",
+      "date": "2025-09-08 16:27:48",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 474087,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Zebranie",
+      "body": "",
+      "date": "2025-09-07 15:43:09",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 464716,
+      "from": "Skutela Gabriela (Skutela Gabriela)",
+      "subject": "Wymagania edukacyjne z języka angielskiego",
+      "body": "",
+      "date": "2025-09-06 22:12:21",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 322058,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Wymagania edukacyjne",
+      "body": "",
+      "date": "2025-09-03 18:37:36",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 320230,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Wycieczka",
+      "body": "",
+      "date": "2025-09-03 18:01:32",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 202768,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Kot w tarapatach- wakacyjna pocztówka",
+      "body": "",
+      "date": "2025-09-01 20:03:57",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 195262,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Basen",
+      "body": "",
+      "date": "2025-09-01 17:20:02",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    },
+    {
+      "id": 129001,
+      "from": "Sokół Bernadetta (Sokół Bernadetta)",
+      "subject": "Rozpoczęcie roku szkolnego",
+      "body": "",
+      "date": "2025-08-29 13:57:30",
+      "isRead": true,
+      "hasAttachments": false,
+      "attachments": []
+    }
+  ],
+  "announcements": [
+    {
+      "title": "Małopolski Konkurs Pięknego Czytania",
+      "content": "Drodzy Uczniowie.\nZachęcam Was do wzięcia udziału w Małopolskim Konkursie Pięknego Czytania.\n\n1. Organizator: Towarzystwo Nauczycieli Bibliotekarzy Szkół Polskich\nOddział w Krakowie oraz Wojewódzka Biblioteka Publiczna w Krakowie\n2. Przesłuchania szkolne: \n-  klasy 1-3 - środa 5 listopada w godz.: 8.30-10.10\n-  klasy 4-6 - środa 5 listopada 11.15-12.00\n-  klasy 7-8 - czwartek 6 listopada 11.15-12.00\n3. Etap międzyszkolny odbędzie się 26 listopada w Bibliotece Wojewódzkiej.\n4. Należy przygotować do czytania fragment  ulubionej książki z literatury dla dzieci i młodzieży.\nUczestnicy czytają przygotowany fragment prozy zawierający dialog i opis.\n5. Ocenie podlega:\n-   dykcja (0-3 pkt.),\n-   interpretacja tekstu (0-3 pkt.),\n-   zachowanie limitu czasu (do 3 minut) (1 pkt).\n6. Na etap międzyszkolny należy przynieść podpisane oświadczenie rodziców (opiekunów prawnych)- do odebrania w bibliotece.\n\nZgłaszać można się osobiście w bibliotece lub poprzez Librus (wiadomość do P. Renaty Kozioł) do dnia 3 listopada do godz. 12.00.\n\nW razie zmian organizacyjnych wynikających z liczby uczestników skrócimy lub wydłużymy czas przesłuchań, o czym Was poinformujemy. \n\nZachęcamy raz jeszcze do konkursu.\n\nOrganizatorki: \nRenata Kozioł, Paulina Orłowska, Eryka Ball.",
+      "date": "2025-10-16",
+      "author": "Renata Kozioł"
+    },
+    {
+      "title": "Klub Odkrywców Książek",
+      "content": "Drodzy uczniowie klas 3-6 zachęcam Was do udziału w zabawie czytelniczej \"Klub Odkrywców Książek\"\nJuż o niej pisałam .\nPrzedłużam czas zabawy do końca stycznia. \nWystarczy przeczytać 3 książki i wykonać zadanie/wyzwanie, a zdobędziesz tytuł Odkrywcy Książek oraz nagrodę, którą wylosujesz w loterii fantowej. \nZapraszam do biblioteki po kartę czytelnika.\n\nRenata Kozioł- bibliotekarz",
+      "date": "2025-10-14",
+      "author": "Renata Kozioł"
+    },
+    {
+      "title": "Sukces w zawodach",
+      "content": "Z wielką przyjemnością informuję ,że Natalia Kosek uczennica klasy 2a w miniony weekend  brała udział w Ogólnopolskich Zawodach w Skokach na Ścieżce i Podwójnej Trampolinie Korona Cup 7.  W zawodach brało w sumie 380 dzieci w różnych konkurencjach. Natalia zdobyła 3 miejsce.\nSerdecznie gratulujemy tak wysokiego miejsca !!!",
+      "date": "2025-10-13",
+      "author": "Bernadetta Sokół"
+    },
+    {
+      "title": "konkurs Kuratoryjny z języka hiszpańskiego",
+      "content": "Zachęcam do udziały w Kuratoryjnym tematycznym konkursie z języka hiszpańskiego pt.: \"Przygoda z hiszpańskim\". Etap szkolny odbędzie się 13 listopada 2025 r.\n\nSzczegóły dotyczące konkursu są na stronie: https://kuratorium.krakow.pl/konkurs-tematyczny-przygoda-z-hiszpanskim-dla-uczniow-szkol-podstawowych-wojewodztwa-malopolskiego-w-roku-szkolnym-2025-2026/",
+      "date": "2025-09-24",
+      "author": "Roman Lodeiro Vales"
+    },
+    {
+      "title": "Dzień Jabłka",
+      "content": "29 września obchodzimy w klasach I-III Dzień Jabłka - to doskonała okazja do promowania zdrowego stylu życia i jedzenia owoców. \nZachęcamy wszystkich do ubrania się w kolorach jabłek. \n\nZespół Edukacji Wczesnoszkolnej",
+      "date": "2025-09-24",
+      "author": "Agata Pasternak"
+    }
+  ],
+  "schedule": {
+    "hours": [
+      "07:35 - 08:20",
+      "08:30 - 09:15",
+      "09:25 - 10:10",
+      "10:20 - 11:05",
+      "11:15 - 12:00",
+      "12:20 - 13:05",
+      "13:25 - 14:10",
+      "14:25 - 15:10",
+      "15:20 - 16:05",
+      "16:10 - 16:55"
+    ],
+    "table": {
+      "Monday": [
+        null,
+        null,
+        null,
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "10:20 - 11:05",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "11:15 - 12:00",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "12:20 - 13:05",
+          "substitution": false
+        },
+        {
+          "subject": "Wychowanie fizyczne",
+          "teacher": "Sokół Bernadetta",
+          "room": "spac/wyspa",
+          "time": "13:25 - 14:10",
+          "substitution": false
+        },
+        null,
+        null,
+        null
+      ],
+      "Tuesday": [
+        null,
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "08:30 - 09:15",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "09:25 - 10:10",
+          "substitution": false
+        },
+        {
+          "subject": "Język angielski",
+          "teacher": "Skutela Gabriela",
+          "room": "1",
+          "time": "10:20 - 11:05",
+          "substitution": false
+        },
+        {
+          "subject": "Wychowanie fizyczne",
+          "teacher": "Sokół Bernadetta",
+          "room": "sgd",
+          "time": "11:15 - 12:00",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "12:20 - 13:05",
+          "substitution": false
+        },
+        null,
+        null,
+        null,
+        null
+      ],
+      "Wednesday": [
+        null,
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "08:30 - 09:15",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "09:25 - 10:10",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja informatyczna",
+          "teacher": "Sokół Bernadetta",
+          "room": "p. i",
+          "time": "10:20 - 11:05",
+          "substitution": false
+        },
+        {
+          "subject": "Wychowanie fizyczne",
+          "teacher": "Sokół Bernadetta",
+          "room": "sgm",
+          "time": "11:15 - 12:00",
+          "substitution": false
+        },
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "Thursday": [
+        null,
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "08:30 - 09:15",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "09:25 - 10:10",
+          "substitution": false
+        },
+        {
+          "subject": "Język angielski",
+          "teacher": "Skutela Gabriela",
+          "room": "1",
+          "time": "10:20 - 11:05",
+          "substitution": false
+        },
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "Friday": [
+        null,
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "08:30 - 09:15",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "09:25 - 10:10",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "10:20 - 11:05",
+          "substitution": false
+        },
+        {
+          "subject": "Edukacja wczesnoszkolna",
+          "teacher": "Sokół Bernadetta",
+          "room": "1",
+          "time": "11:15 - 12:00",
+          "substitution": false
+        },
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "Saturday": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "Sunday": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  },
+  "attendance": [],
+  "calendar": [
+    {
+      "description": "",
+      "addedBy": ""
+    },
+    {
+      "description": "",
+      "addedBy": ""
+    },
+    {
+      "description": "",
+      "addedBy": ""
+    },
+    {
+      "description": "",
+      "addedBy": ""
+    },
+    {
+      "description": "",
+      "addedBy": ""
+    },
+    {
+      "description": "",
+      "addedBy": ""
+    }
+  ]
+}
