@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Fixed
+- **[2025-10-16]** Fixed launchd stdout.log being written to wrong folder due to typo
+  - Corrected `/Users/olena/Projects/libruss/logs/stdout.log` to `/Users/olena/Projects/librus/logs/stdout.log`
+  - Moved existing stdout.log to correct location as `stdout_recovered.log`
+  - Reloaded launchd service with corrected configuration
+  - Location: `~/Library/LaunchAgents/com.librus.notifier.plist`
+
 - **[2025-10-16]** Fixed announcement notifications not being detected due to missing unique IDs
   - Added `createAnnouncementId()` method in `LibrusClient` to generate unique IDs based on content hash
   - Enhanced announcement formatting with emoji icons (📅 for date, 👤 for author) and robust fallback logic
