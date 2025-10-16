@@ -171,27 +171,46 @@ class ReportGenerator {
   }
 
   static formatCalendarEvent(event) {
-    let text = `   📌 *${event.title}*\n`;
-    if (event.description) {
-      text += `   ${event.description}\n`;
+    const emoji = this.getEventEmoji(event.category);
+    let text = `   ${emoji} *${event.title}*\n`;
+
+    if (event.date) {
+      // Format date nicely
+      try {
+        const date = new Date(event.date);
+        const formatted = date.toLocaleDateString('pl-PL', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        text += `   📅 ${formatted}\n`;
+      } catch (e) {
+        text += `   📅 ${event.date}\n`;
+      }
     }
-    if (event.dateFrom) {
-      text += `   Od: ${this.formatDate(event.dateFrom)}\n`;
-    }
-    if (event.dateTo) {
-      text += `   Do: ${this.formatDate(event.dateTo)}\n`;
-    }
-    if (event.date && !event.dateFrom) {
-      text += `   Data: ${this.formatDate(event.date)}\n`;
-    }
+
     if (event.category) {
-      text += `   Kategoria: ${event.category}\n`;
+      text += `   🏷️ ${event.category}\n`;
     }
-    if (event.addedBy) {
-      text += `   Dodał: ${event.addedBy}\n`;
+
+    if (event.description) {
+      text += `   📝 ${event.description}\n`;
     }
+
     text += '\n';
     return text;
+  }
+
+  static getEventEmoji(category) {
+    if (!category) return '📌';
+
+    if (category.includes('Kartkówka')) return '📝';
+    if (category.includes('Sprawdzian')) return '📋';
+    if (category.includes('Nieobecność')) return '👤';
+    if (category.includes('Zastępstwo')) return '🔄';
+
+    return '📌';
   }
 
   static formatDate(dateStr) {

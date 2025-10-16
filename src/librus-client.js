@@ -336,23 +336,48 @@ class LibrusClient {
   async fetchCalendar() {
     try {
       const calendar = await this.client.calendar.getCalendar();
-      
+
       if (!Array.isArray(calendar)) return [];
-      
-      return calendar.map(event => ({
-        id: event.id,
-        title: event.title || event.name,
-        description: event.description || event.content || '',
-        date: event.date || event.startDate,
-        dateFrom: event.dateFrom,
-        dateTo: event.dateTo,
-        category: event.category || event.type,
-        addedBy: event.addedBy || event.author || ''
-      }));
+
+      // Calendar API returns array of arrays (events grouped by day)
+      // Flatten and map to our format
+      const events = [];
+
+      for (const dayEvents of calendar) {
+        if (!Array.isArray(dayEvents)) continue;
+
+        for (const event of dayEvents) {
+          // Skip events without valid IDs
+          if (!event.id || event.id === -1) continue;
+
+          events.push({
+            id: event.id,
+            title: event.title || '',
+            date: event.day || event.date || '',
+            description: event.description || '',
+            // Parse event type from title if available
+            category: this.parseEventCategory(event.title)
+          });
+        }
+      }
+
+      logger.info(`Fetched ${events.length} calendar events`);
+      return events;
     } catch (error) {
       logger.warn(`Failed to fetch calendar: ${error.message}`);
       return [];
     }
+  }
+
+  parseEventCategory(title) {
+    if (!title) return 'Inne';
+
+    if (title.includes('kartkówka')) return 'Kartkówka';
+    if (title.includes('sprawdzian')) return 'Sprawdzian';
+    if (title.includes('Nieobecność')) return 'Nieobecność nauczyciela';
+    if (title.includes('Zastępstwo')) return 'Zastępstwo';
+
+    return 'Inne';
   }
 
   sleep(ms) {

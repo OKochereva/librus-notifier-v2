@@ -54,7 +54,8 @@ class StateManager {
       messages: [],
       announcements: [],
       schedule: [],
-      attendance: []
+      attendance: [],
+      calendar: []
     };
   }
 
@@ -66,7 +67,8 @@ class StateManager {
       newMessages: [],
       newAnnouncements: [],
       scheduleChanges: [],
-      newAttendance: []
+      newAttendance: [],
+      newCalendarEvents: []
     };
 
     // Find new grades with timestamp filtering
@@ -98,13 +100,20 @@ class StateManager {
       a => !previousAttendanceIds.has(a.id)
     );
 
+    // Find new calendar events
+    const previousCalendarIds = new Set(previousData.calendar.map(e => e.id));
+    changes.newCalendarEvents = currentData.calendar.filter(
+      e => e.id && !previousCalendarIds.has(e.id)
+    );
+
     // Calculate totals
     changes.totalCount =
       changes.newGrades.length +
       changes.newMessages.length +
       changes.newAnnouncements.length +
       changes.scheduleChanges.length +
-      changes.newAttendance.length;
+      changes.newAttendance.length +
+      changes.newCalendarEvents.length;
 
     changes.hasChanges = changes.totalCount > 0;
 
