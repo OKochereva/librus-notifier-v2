@@ -103,21 +103,37 @@ class ReportGenerator {
   }
 
   static formatMessageBody(body) {
+    if (!body || body.trim() === '') {
+      return '   [Brak treści wiadomości]\n\n';
+    }
+
+    // Convert HTML to readable text with proper line breaks
     const cleanBody = body
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
+      .replace(/<\/p>/gi, '\n\n')     // End of paragraph becomes double newline
+      .replace(/<br\s*\/?>/gi, '\n')  // Line breaks become single newline
+      .replace(/<\/div>/gi, '\n')     // End of div becomes newline
+      .replace(/<[^>]*>/g, '')        // Remove all other HTML tags
+      .replace(/&nbsp;/g, ' ')        // Convert non-breaking spaces
+      .replace(/&amp;/g, '&')         // Convert HTML entities
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
       .trim();
 
+    // Split into lines and clean up spacing
     const lines = cleanBody.split('\n');
     let formatted = '';
+
     for (const line of lines) {
-      if (line.trim()) {
-        formatted += `   ${line.trim()}\n`;
+      const trimmedLine = line.trim();
+      if (trimmedLine) {
+        formatted += `   ${trimmedLine}\n`;
+      } else if (formatted.endsWith('\n') && !formatted.endsWith('\n\n')) {
+        // Add empty line for paragraph breaks, but don't create multiple empty lines
+        formatted += '\n';
       }
     }
+
     formatted += '\n';
     return formatted;
   }

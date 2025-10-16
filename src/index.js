@@ -63,8 +63,8 @@ async function sendTomorrowSchedule() {
 
 async function checkForUpdates() {
   logger.info('=== Starting Librus check ===');
-  
-  const stateManager = new StateManager();
+
+  const stateManager = new StateManager(config);
   const notifier = new Notifier(config);
   const allUpdates = [];
   let hasBlockingErrors = false;

@@ -82,8 +82,17 @@ class LibrusClient {
                   // Parse the info field to extract details
                   const info = this.parseGradeInfo(grade.info);
 
+                  // Create a unique identifier for grades without IDs
+                  const uniqueId = grade.id || this.createGradeId({
+                    subject: subjectName,
+                    value: grade.value,
+                    date: info.date || 'Unknown',
+                    teacher: info.teacher || '',
+                    comment: info.comment || ''
+                  });
+
                   grades.push({
-                    id: grade.id,
+                    id: uniqueId,
                     subject: subjectName,
                     value: grade.value,
                     category: info.category || 'Unknown',
@@ -136,23 +145,88 @@ class LibrusClient {
     return info;
   }
 
+  createGradeId(gradeData) {
+    // Create a unique identifier based on grade properties
+    const { subject, value, date, teacher, comment } = gradeData;
+    const dataString = `${subject}-${value}-${date}-${teacher}-${comment.substring(0, 50)}`;
+
+    // Simple hash function to create a unique ID
+    let hash = 0;
+    for (let i = 0; i < dataString.length; i++) {
+      const char = dataString.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+
+    return `custom_${Math.abs(hash)}`;
+  }
+
   async fetchMessages() {
     try {
       const INBOX_FOLDER = 5; // Standard inbox folder ID
-      const messages = await this.client.inbox.listInbox(INBOX_FOLDER);
-      
-      if (!Array.isArray(messages)) return [];
-      
-      return messages.map(msg => ({
-        id: msg.id,
-        from: msg.sender || msg.user || 'Unknown',
-        subject: msg.topic || msg.title,
-        body: msg.content || msg.body || '',
-        date: msg.date || msg.sendDate,
-        isRead: msg.read || false,
-        hasAttachments: (msg.files?.length || 0) > 0,
-        attachments: msg.files || []
-      }));
+      const messageHeaders = await this.client.inbox.listInbox(INBOX_FOLDER);
+
+      if (!Array.isArray(messageHeaders)) return [];
+
+      const messages = [];
+
+      // Fetch full content for unread messages (since those are what we notify about)
+      for (const header of messageHeaders) {
+        try {
+          let body = '';
+          let attachments = [];
+          let hasAttachments = false;
+
+          // Only fetch full content for unread messages to optimize performance
+          if (!header.read) {
+            try {
+              const fullMessage = await this.client.inbox.getMessage(INBOX_FOLDER, header.id);
+              body = fullMessage.content || '';
+              attachments = fullMessage.files || [];
+              hasAttachments = (fullMessage.files?.length || 0) > 0;
+
+              // Add a small delay to avoid overwhelming the server
+              await this.sleep(200);
+
+            } catch (msgError) {
+              logger.warn(`Failed to fetch full content for unread message ${header.id}: ${msgError.message}`);
+              // Continue with empty body for this message
+            }
+          }
+
+          messages.push({
+            id: header.id,
+            from: header.user || 'Unknown',
+            subject: header.title || 'No Subject',
+            body: body,
+            date: header.date,
+            isRead: header.read || false,
+            hasAttachments: hasAttachments,
+            attachments: attachments
+          });
+
+        } catch (msgError) {
+          logger.warn(`Failed to process message ${header.id}: ${msgError.message}`);
+
+          // Fallback: use header data only
+          messages.push({
+            id: header.id,
+            from: header.user || 'Unknown',
+            subject: header.title || 'No Subject',
+            body: '',
+            date: header.date,
+            isRead: header.read || false,
+            hasAttachments: false,
+            attachments: []
+          });
+        }
+      }
+
+      const unreadCount = messages.filter(m => !m.isRead).length;
+      const withContentCount = messages.filter(m => m.body).length;
+      logger.info(`Fetched ${messages.length} messages (${unreadCount} unread, ${withContentCount} with content)`);
+      return messages;
+
     } catch (error) {
       logger.warn(`Failed to fetch messages: ${error.message}`);
       return [];

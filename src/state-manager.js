@@ -3,8 +3,9 @@ const path = require('path');
 const logger = require('./logger');
 
 class StateManager {
-  constructor() {
+  constructor(config = null) {
     this.stateDir = path.join(process.cwd(), 'state');
+    this.config = config;
     this.ensureStateDir();
   }
 
@@ -68,9 +69,12 @@ class StateManager {
       newAttendance: []
     };
 
-    // Find new grades
+    // Find new grades with timestamp filtering
     const previousGradeIds = new Set(previousData.grades.map(g => g.id));
-    changes.newGrades = currentData.grades.filter(g => !previousGradeIds.has(g.id));
+    const allNewGrades = currentData.grades.filter(g => !previousGradeIds.has(g.id));
+
+    // Apply timestamp filtering for grades if configured
+    changes.newGrades = this.filterGradesByDate(allNewGrades);
 
     // Find new unread messages
     const previousMessageIds = new Set(previousData.messages.map(m => m.id));
@@ -95,7 +99,7 @@ class StateManager {
     );
 
     // Calculate totals
-    changes.totalCount = 
+    changes.totalCount =
       changes.newGrades.length +
       changes.newMessages.length +
       changes.newAnnouncements.length +
@@ -104,7 +108,66 @@ class StateManager {
 
     changes.hasChanges = changes.totalCount > 0;
 
+    // Log filtering decisions if detailed logging is enabled
+    if (this.config?.gradeNotifications?.detailedLogging) {
+      this.logFilteringDecisions(allNewGrades, changes.newGrades);
+    }
+
     return changes;
+  }
+
+  filterGradesByDate(grades) {
+    // If no config or filtering disabled, return all grades
+    if (!this.config?.gradeNotifications?.maxGradeAgeDays ||
+        this.config.gradeNotifications.maxGradeAgeDays === 0) {
+      return grades;
+    }
+
+    const maxAgeMs = this.config.gradeNotifications.maxGradeAgeDays * 24 * 60 * 60 * 1000;
+    const cutoffDate = new Date(Date.now() - maxAgeMs);
+
+    return grades.filter(grade => {
+      const gradeDate = this.parseGradeDate(grade.date);
+
+      if (!gradeDate) {
+        // If we can't parse the date, include the grade to be safe
+        logger.warn(`Could not parse grade date: ${grade.date} for grade ${grade.id}`);
+        return true;
+      }
+
+      return gradeDate >= cutoffDate;
+    });
+  }
+
+  parseGradeDate(dateString) {
+    if (!dateString || dateString === 'Unknown') {
+      return null;
+    }
+
+    // Handle format like "2025-10-16 (czw.)" or "2025-10-14 (wt.)"
+    const dateMatch = dateString.match(/(\d{4}-\d{2}-\d{2})/);
+    if (dateMatch) {
+      return new Date(dateMatch[1]);
+    }
+
+    // Fallback: try to parse the string directly
+    const parsed = new Date(dateString);
+    return isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  logFilteringDecisions(allNewGrades, filteredGrades) {
+    const filtered = allNewGrades.length - filteredGrades.length;
+
+    if (filtered > 0) {
+      logger.info(`Grade filtering: ${allNewGrades.length} new grades found, ${filtered} filtered out due to age, ${filteredGrades.length} will be notified`);
+
+      const filteredOut = allNewGrades.filter(grade => !filteredGrades.includes(grade));
+      for (const grade of filteredOut) {
+        logger.info(`Filtered out grade: ${grade.subject} - ${grade.value} (date: ${grade.date}) - too old`);
+      }
+    } else {
+      logger.info(`Grade filtering: ${allNewGrades.length} new grades found, all within notification window`);
+    }
   }
 }
 
