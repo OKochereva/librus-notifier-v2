@@ -2,9 +2,9 @@ class ScheduleFormatter {
   static formatTomorrowSchedule(accountName, timetableData) {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     const dayName = tomorrow.toLocaleDateString('pl-PL', { weekday: 'long' });
-    const dateStr = tomorrow.toLocaleDateString('pl-PL', { 
+    const dateStr = tomorrow.toLocaleDateString('pl-PL', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -22,7 +22,17 @@ class ScheduleFormatter {
       report += `✨ Brak lekcji!\n\n`;
     } else {
       tomorrowLessons.sort((a, b) => a.lessonNo - b.lessonNo);
-      
+
+      // Check if all lessons are canceled
+      const allCancelled = tomorrowLessons.every(lesson => lesson.cancelled);
+      const cancelledCount = tomorrowLessons.filter(lesson => lesson.cancelled).length;
+
+      if (allCancelled) {
+        report += `⚠️ *WSZYSTKIE LEKCJE ODWOŁANE!* ⚠️\n\n`;
+      } else if (cancelledCount > 0) {
+        report += `⚠️ *Odwołane lekcje: ${cancelledCount}/${tomorrowLessons.length}*\n\n`;
+      }
+
       for (const lesson of tomorrowLessons) {
         report += this.formatLesson(lesson);
       }

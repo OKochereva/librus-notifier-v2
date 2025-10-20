@@ -134,59 +134,80 @@ class SubstitutionScraper {
 
   parseHTML(html) {
     const subs = new Set();
+    const cancellations = new Set();
 
-    logger.info('Parsing HTML for substitutions');
+    logger.info('Parsing HTML for substitutions and cancellations');
 
-    // Use regex to find all lesson entries with substitutions
-    // Looking for cells with: data-date and containing "zastępstwo"
-    const cellPattern = /<td[^>]*id="timetableEntryBox"[^>]*data-date="([^"]+)"[^>]*>([\s\S]*?)<\/td>/g;
-    let match;
+    // Parse rows to track lesson numbers
+    // Each row pattern: <tr class="line1"><td class="center" style="height: 50px;" >N</td>...
+    const rowPattern = /<tr class="line[01]"><td class="center"[^>]*>(\d+)<\/td><th class="center[^>]*>([\d:&nbsp;-]+)<\/th>([\s\S]*?)<\/tr>/g;
+    let rowMatch;
 
-    while ((match = cellPattern.exec(html)) !== null) {
-      const dateStr = match[1];  // e.g., "2025-10-16"
-      const cellContent = match[2];
+    while ((rowMatch = rowPattern.exec(html)) !== null) {
+      const lessonNo = parseInt(rowMatch[1]);
+      const rowContent = rowMatch[3]; // All the cells in this row
 
-      // Check if this cell contains a substitution marker
-      const hasSubstitution = cellContent.includes('zastępstwo') ||
-                             cellContent.includes('plan-lekcji-info');
+      // Now find all cells with dates in this row
+      const cellPattern = /<td[^>]*id="timetableEntryBox"[^>]*data-date="([^"]+)"[^>]*>([\s\S]*?)<\/td>/g;
+      let cellMatch;
 
-      if (hasSubstitution) {
-        // Parse the date to get day name
-        const date = new Date(dateStr);
-        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const dayName = dayNames[date.getDay()];
+      while ((cellMatch = cellPattern.exec(rowContent)) !== null) {
+        const dateStr = cellMatch[1];  // e.g., "2025-10-21"
+        const cellContent = cellMatch[2];
 
-        // Extract lesson number from the title attribute: <b>Nr lekcji:</b> 2
-        const lessonNoMatch = cellContent.match(/<b>Nr lekcji:<\/b>\s*(\d+)/);
-        if (lessonNoMatch) {
-          const lessonNo = parseInt(lessonNoMatch[1]);
+        // Check if this cell contains a substitution marker
+        const hasSubstitution = cellContent.includes('zastępstwo');
+
+        // Check if this cell contains a cancellation marker
+        const hasCancellation = cellContent.includes('odwołane');
+
+        if (hasSubstitution || hasCancellation) {
+          // Parse the date to get day name
+          const date = new Date(dateStr);
+          const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          const dayName = dayNames[date.getDay()];
+
           const key = `${dayName}-${lessonNo}`;
-          subs.add(key);
-          logger.info(`Detected substitution: ${key} on ${dateStr}`);
-        } else {
-          logger.warn(`Found substitution but couldn't extract lesson number for ${dateStr}`);
+
+          if (hasCancellation) {
+            cancellations.add(key);
+            logger.info(`Detected cancellation: ${key} on ${dateStr} (lesson ${lessonNo})`);
+          } else if (hasSubstitution) {
+            subs.add(key);
+            logger.info(`Detected substitution: ${key} on ${dateStr} (lesson ${lessonNo})`);
+          }
         }
       }
     }
 
-    logger.info(`Total substitutions found: ${subs.size}`);
-    return subs;
+    logger.info(`Total substitutions found: ${subs.size}, cancellations found: ${cancellations.size}`);
+    return { substitutions: subs, cancellations: cancellations };
   }
 
-  enhanceTimetable(timetableData, substitutionKeys) {
+  enhanceTimetable(timetableData, detectionResult) {
     if (!timetableData || !timetableData.table) return timetableData;
 
-    logger.info(`Enhancing timetable with ${substitutionKeys.size} substitution keys`);
+    // Handle both old format (Set) and new format (object with substitutions/cancellations)
+    const substitutionKeys = detectionResult.substitutions || detectionResult || new Set();
+    const cancellationKeys = detectionResult.cancellations || new Set();
+
+    logger.info(`Enhancing timetable with ${substitutionKeys.size} substitutions and ${cancellationKeys.size} cancellations`);
 
     for (const [day, lessons] of Object.entries(timetableData.table)) {
       lessons.forEach((lesson, idx) => {
         if (lesson) {
           const key = `${day}-${idx}`;
           const hasSubstitution = substitutionKeys.has(key);
+          const hasCancellation = cancellationKeys.has(key);
+
           lesson.substitution = hasSubstitution;
+          lesson.cancelled = hasCancellation;
 
           if (hasSubstitution) {
             logger.info(`Applied substitution flag to ${key}: ${lesson.subject || 'Unknown'}`);
+          }
+          if (hasCancellation) {
+            logger.info(`Applied cancellation flag to ${key}: ${lesson.subject || 'Unknown'}`);
           }
         }
       });
@@ -200,7 +221,10 @@ class SubstitutionScraper {
 
     for (const lessons of Object.values(timetableData.table)) {
       lessons.forEach(lesson => {
-        if (lesson) lesson.substitution = false;
+        if (lesson) {
+          lesson.substitution = false;
+          lesson.cancelled = false;
+        }
       });
     }
 

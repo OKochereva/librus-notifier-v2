@@ -7,7 +7,9 @@ Automated Librus Synergia monitor running on your Mac. Get instant Telegram noti
 - ✅ Runs by schedule (Monday-Friday 10:00, 11:30, 13:00, 14:30, 16:00, 19:00; Saturday-Sunday 11:00, 18:00)
 - ✅ Multi-account support (Illia & Kostia)
 - ✅ Tomorrow's lesson plan at 16:00
+- ✅ Upcoming tests reminder at 14:30 (Mon-Fri) and 11:00 (Sunday)
 - ✅ **Substitution detection with 🔄 emoji for replaced lessons**
+- ✅ **Cancellation detection with ❌ emoji and prominent alerts**
 - ✅ Tracks: grades, messages, announcements, calendar events, attendance
 - ✅ Full message content
 - ✅ Smart change detection (no duplicates)
@@ -100,8 +102,13 @@ tail -f logs/stderr.log
 |------|-------------|
 | 09:30 AM | Morning check (grades, messages, events) |
 | 13:00 PM | Midday check |
+| 14:30 PM | **Upcoming tests reminder** (Mon-Fri) + updates check |
 | 16:00 PM | **Tomorrow's lesson plan** + updates check |
 | 20:00 PM | Evening check |
+
+**Weekend Schedule:**
+- Sunday 11:00 AM - Upcoming tests reminder
+- Saturday/Sunday 11:00 AM & 18:00 PM - Regular updates check
 
 **Note:** If Mac is asleep, the job runs when it wakes up.
 
@@ -186,8 +193,10 @@ You WON'T receive alerts for:
 | **Calendar Events** | New events from terminarz (school calendar) |
 | **Schedule** | Changes to timetable |
 | **Attendance** | New attendance records |
-| **Tomorrow's Lessons** | Daily lesson plan at 16:00 with substitution markers |
+| **Tomorrow's Lessons** | Daily lesson plan at 16:00 with substitution/cancellation markers |
+| **Upcoming Tests** | Reminder of tests in next 2 days (at 14:30 Mon-Fri, 11:00 Sunday) |
 | **Substitutions** | Teacher replacements marked with 🔄 emoji |
+| **Cancellations** | Canceled lessons marked with ❌ emoji and "ODWOŁANA" label |
 
 ---
 
@@ -277,6 +286,28 @@ librus-notifier/
       👨‍🏫 Jan Nowak
       🚪 Sala: 105
       ℹ️ Zastępstwo
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 KOSTIA
+
+⚠️ *WSZYSTKIE LEKCJE ODWOŁANE!* ⚠️
+
+   ❌ Lekcja 1: Matematyka
+      ⏰ 08:00 - 08:45
+      👨‍🏫 Anna Kowalska
+      ⚠️ *ODWOŁANA*
+```
+
+### Upcoming Tests Reminder (14:30 Mon-Fri, 11:00 Sunday)
+```
+📝 NADCHODZĄCE SPRAWDZIANY I KARTKÓWKI
+
+👤 ILLIA
+
+📌 Matematyka - Sprawdzian
+   📅 20.10.2025 (czwartek)
+   📚 Równania kwadratowe
 ```
 
 ---
