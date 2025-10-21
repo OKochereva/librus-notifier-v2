@@ -350,13 +350,28 @@ class LibrusClient {
           // Skip events without valid IDs
           if (!event.id || event.id === -1) continue;
 
+          const category = this.parseEventCategory(event.title);
+
+          // For tests and quizzes, fetch detailed information including description
+          let description = '';
+          if (category === 'Sprawdzian' || category === 'Kartkówka') {
+            try {
+              const details = await this.client.calendar.getEvent(event.id, false);
+              if (details && details.description) {
+                description = details.description;
+                logger.info(`Fetched description for event ${event.id}: ${description.substring(0, 50)}...`);
+              }
+            } catch (detailError) {
+              logger.warn(`Failed to fetch event details for ${event.id}: ${detailError.message}`);
+            }
+          }
+
           events.push({
             id: event.id,
             title: event.title || '',
             date: event.day || event.date || '',
-            description: event.description || '',
-            // Parse event type from title if available
-            category: this.parseEventCategory(event.title)
+            description: description,
+            category: category
           });
         }
       }

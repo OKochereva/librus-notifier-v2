@@ -95,7 +95,11 @@ class UpcomingEventsFormatter {
 
   static formatEvent(event) {
     const emoji = this.getEventEmoji(event.category);
-    let text = `   ${emoji} *${event.title}*\n`;
+
+    // Parse and clean the title
+    const cleanedTitle = this.parseEventTitle(event.title);
+
+    let text = `   ${emoji} *${cleanedTitle}*\n`;
 
     if (event.date) {
       try {
@@ -116,8 +120,45 @@ class UpcomingEventsFormatter {
       text += `      🏷️ ${event.category}\n`;
     }
 
+    // Add description if available
+    if (event.description && event.description.trim()) {
+      const description = event.description.trim();
+      // Limit description length to avoid overly long messages
+      const maxLength = 200;
+      const truncated = description.length > maxLength
+        ? description.substring(0, maxLength) + '...'
+        : description;
+      text += `      📝 ${truncated}\n`;
+    }
+
     text += '\n';
     return text;
+  }
+
+  static parseEventTitle(title) {
+    if (!title) return 'Wydarzenie';
+
+    // Pattern: "Nr lekcji: 3Język angielski, sprawdzian2a SP"
+    // Extract the subject and type parts
+
+    // Remove "Nr lekcji: X" prefix
+    let cleaned = title.replace(/Nr lekcji:\s*\d+/i, '');
+
+    // Remove room/class info like "Sala: 21", "5c SP", "2a SP"
+    cleaned = cleaned.replace(/Sala:\s*\d+/gi, '');
+    cleaned = cleaned.replace(/\d+[a-z]\s*SP/gi, '');
+
+    // Clean up extra spaces and commas
+    cleaned = cleaned.replace(/,\s*,/g, ',');
+    cleaned = cleaned.replace(/\s+/g, ' ');
+    cleaned = cleaned.trim();
+
+    // If title starts with comma, remove it
+    if (cleaned.startsWith(',')) {
+      cleaned = cleaned.substring(1).trim();
+    }
+
+    return cleaned || title;
   }
 
   static getEventEmoji(category) {
