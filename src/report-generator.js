@@ -33,9 +33,22 @@ class ReportGenerator {
     }
 
     if (updates.newMessages && updates.newMessages.length > 0) {
-      section += `📨 *NOWE WIADOMOŚCI (${updates.newMessages.length})*\n\n`;
-      for (const message of updates.newMessages) {
-        section += this.formatMessage(message);
+      // Separate messages and notes
+      const regularMessages = updates.newMessages.filter(m => !m.isNote);
+      const notes = updates.newMessages.filter(m => m.isNote);
+
+      if (regularMessages.length > 0) {
+        section += `📨 *NOWE WIADOMOŚCI (${regularMessages.length})*\n\n`;
+        for (const message of regularMessages) {
+          section += this.formatMessage(message);
+        }
+      }
+
+      if (notes.length > 0) {
+        section += `📝 *NOWE UWAGI (${notes.length})*\n\n`;
+        for (const note of notes) {
+          section += this.formatMessage(note);
+        }
       }
     }
 

@@ -179,15 +179,24 @@ class LibrusClient {
 
   async fetchMessages() {
     try {
-      const INBOX_FOLDER = 5; // Standard inbox folder ID
-      const messageHeaders = await this.client.inbox.listInbox(INBOX_FOLDER);
+      const INBOX_FOLDER = 5; // Standard inbox folder ID (Odebrane)
+      const UWAGI_FOLDER = 10; // Notes/Remarks folder (Uwagi)
 
-      if (!Array.isArray(messageHeaders)) return [];
+      // Fetch messages from both folders and tag them with folder ID
+      const inboxHeaders = await this.client.inbox.listInbox(INBOX_FOLDER);
+      const uwagiHeaders = await this.client.inbox.listInbox(UWAGI_FOLDER);
+
+      const allHeaders = [
+        ...(Array.isArray(inboxHeaders) ? inboxHeaders.map(h => ({ ...h, folderId: INBOX_FOLDER })) : []),
+        ...(Array.isArray(uwagiHeaders) ? uwagiHeaders.map(h => ({ ...h, folderId: UWAGI_FOLDER })) : [])
+      ];
+
+      if (allHeaders.length === 0) return [];
 
       const messages = [];
 
       // Fetch full content for unread messages (since those are what we notify about)
-      for (const header of messageHeaders) {
+      for (const header of allHeaders) {
         try {
           let body = '';
           let attachments = [];
@@ -196,7 +205,7 @@ class LibrusClient {
           // Only fetch full content for unread messages to optimize performance
           if (!header.read) {
             try {
-              const fullMessage = await this.client.inbox.getMessage(INBOX_FOLDER, header.id);
+              const fullMessage = await this.client.inbox.getMessage(header.folderId, header.id);
               body = fullMessage.content || '';
               attachments = fullMessage.files || [];
               hasAttachments = (fullMessage.files?.length || 0) > 0;
@@ -218,7 +227,8 @@ class LibrusClient {
             date: header.date,
             isRead: header.read || false,
             hasAttachments: hasAttachments,
-            attachments: attachments
+            attachments: attachments,
+            isNote: header.folderId === UWAGI_FOLDER // Mark if it's from Uwagi folder
           });
 
         } catch (msgError) {
@@ -233,7 +243,8 @@ class LibrusClient {
             date: header.date,
             isRead: header.read || false,
             hasAttachments: false,
-            attachments: []
+            attachments: [],
+            isNote: header.folderId === UWAGI_FOLDER // Mark if it's from Uwagi folder
           });
         }
       }
