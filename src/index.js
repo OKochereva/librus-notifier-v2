@@ -14,20 +14,22 @@ async function main() {
   const currentDay = now.getDay(); // 0=Sunday, 1=Monday, etc.
 
   // Determine what to run based on time
-  const isScheduleTime = currentHour === 16; // 16:00 - tomorrow's timetable
+  const isScheduleTime =
+    currentHour === 16 || // 16:00 Mon-Fri - tomorrow's timetable
+    (currentHour === 17 && currentDay === 0); // 17:00 Sunday - tomorrow's timetable (Monday)
   const isReminderTime =
     (currentHour === 14 && currentMinute === 30 && currentDay >= 1 && currentDay <= 5) || // 14:30 Mon-Fri
-    (currentHour === 11 && currentMinute === 0 && currentDay === 0); // 11:00 Sunday
+    (currentHour === 9 && currentMinute === 0 && currentDay === 0); // 09:00 Sunday
 
   // Always check for updates
   await checkForUpdates();
 
-  // Send tomorrow's schedule at 16:00
+  // Send tomorrow's schedule at 16:00 (Mon-Fri) and 17:00 (Sunday)
   if (isScheduleTime) {
     await sendTomorrowSchedule();
   }
 
-  // Send upcoming events reminder at 14:30 (Mon-Fri) and 11:00 (Sunday)
+  // Send upcoming events reminder at 14:30 (Mon-Fri) and 09:00 (Sunday)
   if (isReminderTime) {
     await sendUpcomingEventsReminder();
   }

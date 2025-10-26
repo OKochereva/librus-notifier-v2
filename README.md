@@ -98,19 +98,23 @@ tail -f logs/stderr.log
 
 ## 📅 Schedule
 
+**Weekday Schedule (Monday-Friday):**
 | Time | Description |
 |------|-------------|
-| 09:30 AM | Morning check (grades, messages, events) |
-| 13:00 PM | Midday check |
-| 14:30 PM | **Upcoming tests reminder** (Mon-Fri) + updates check |
-| 16:00 PM | **Tomorrow's lesson plan** + updates check |
-| 20:00 PM | Evening check |
+| 10:00 | Morning check (grades, messages, events) |
+| 11:30 | Mid-morning check |
+| 13:00 | Midday check |
+| 14:30 | **Upcoming tests reminder** + updates check |
+| 16:00 | **Tomorrow's lesson plan** + updates check |
+| 19:00 | Evening check |
 
-**Weekend Schedule:**
-- Sunday 11:00 AM - Upcoming tests reminder
-- Saturday/Sunday 11:00 AM & 18:00 PM - Regular updates check
+**Weekend Schedule (Saturday-Sunday):**
+| Time | Description |
+|------|-------------|
+| 11:00 | Morning check (grades, messages, events) |
+| 19:00 | Evening check + **tomorrow's lesson plan** (Sunday only) |
 
-**Note:** If Mac is asleep, the job runs when it wakes up.
+**Note:** Times shown are in Poland/Warsaw timezone (UTC+2). If Mac is asleep, the job runs when it wakes up.
 
 ---
 
