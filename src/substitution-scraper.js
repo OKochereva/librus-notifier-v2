@@ -3,11 +3,14 @@ const logger = require('./logger');
 class SubstitutionScraper {
   async detectSubstitutions(client, timetableData) {
   try {
+    // First, check calendar for teacher absences (for future dates)
+    const calendarSubstitutions = await this.detectSubstitutionsFromCalendar(client, timetableData);
+
     const jar = client.cookie;
 
     if (!jar) {
-      logger.warn('No cookie jar found');
-      return this.markAllNormal(timetableData);
+      logger.warn('No cookie jar found, using calendar-only substitutions');
+      return this.applyCalendarSubstitutions(timetableData, calendarSubstitutions);
     }
 
     // Debug: inspect the jar object itself
@@ -93,8 +96,17 @@ class SubstitutionScraper {
     fs.writeFileSync('timetable.html', html);
     logger.info('Saved timetable.html for inspection');
 
-    const substitutionKeys = this.parseHTML(html);
-    return this.enhanceTimetable(timetableData, substitutionKeys);
+    const htmlDetections = this.parseHTML(html);
+
+    // Merge calendar-based substitutions with HTML detections
+    const mergedDetections = {
+      substitutions: new Set([...htmlDetections.substitutions, ...calendarSubstitutions.keys()]),
+      cancellations: htmlDetections.cancellations
+    };
+
+    logger.info(`Merged detections: ${mergedDetections.substitutions.size} substitutions (${calendarSubstitutions.size} from calendar), ${mergedDetections.cancellations.size} cancellations`);
+
+    return this.enhanceTimetable(timetableData, mergedDetections);
   } catch (error) {
     logger.warn(`Substitution detection failed: ${error.message}`);
     logger.warn(`Stack: ${error.stack}`);
@@ -162,19 +174,15 @@ class SubstitutionScraper {
         const hasCancellation = cellContent.includes('odwołane');
 
         if (hasSubstitution || hasCancellation) {
-          // Parse the date to get day name
-          const date = new Date(dateStr);
-          const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-          const dayName = dayNames[date.getDay()];
-
-          const key = `${dayName}-${lessonNo}`;
+          // Use the exact date instead of day name to avoid matching wrong weeks
+          const key = `${dateStr}-${lessonNo}`;
 
           if (hasCancellation) {
             cancellations.add(key);
-            logger.info(`Detected cancellation: ${key} on ${dateStr} (lesson ${lessonNo})`);
+            logger.info(`Detected cancellation: ${key} (lesson ${lessonNo})`);
           } else if (hasSubstitution) {
             subs.add(key);
-            logger.info(`Detected substitution: ${key} on ${dateStr} (lesson ${lessonNo})`);
+            logger.info(`Detected substitution: ${key} (lesson ${lessonNo})`);
           }
         }
       }
@@ -193,10 +201,30 @@ class SubstitutionScraper {
 
     logger.info(`Enhancing timetable with ${substitutionKeys.size} substitutions and ${cancellationKeys.size} cancellations`);
 
+    // Calculate the start of the current week (Monday)
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday is 6 days after Monday
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - daysFromMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
     for (const [day, lessons] of Object.entries(timetableData.table)) {
+      // Calculate the specific date for this day of the week
+      const dayIndex = dayNames.indexOf(day);
+      if (dayIndex === -1) continue; // Skip if not a recognized day
+
+      const dateForDay = new Date(monday);
+      dateForDay.setDate(monday.getDate() + dayIndex);
+      const dateStr = dateForDay.toISOString().split('T')[0]; // Format: "2025-10-27"
+
       lessons.forEach((lesson, idx) => {
         if (lesson) {
-          const key = `${day}-${idx}`;
+          // Use idx + 1 because HTML lesson numbers are 1-based, but array indices are 0-based
+          const lessonNo = idx + 1;
+          const key = `${dateStr}-${lessonNo}`;
           const hasSubstitution = substitutionKeys.has(key);
           const hasCancellation = cancellationKeys.has(key);
 
@@ -224,6 +252,146 @@ class SubstitutionScraper {
         if (lesson) {
           lesson.substitution = false;
           lesson.cancelled = false;
+        }
+      });
+    }
+
+    return timetableData;
+  }
+
+  async detectSubstitutionsFromCalendar(client, timetableData) {
+    const substitutions = new Map();
+
+    try {
+      // Fetch calendar events
+      const calendar = await client.calendar.getCalendar();
+
+      if (!Array.isArray(calendar)) return substitutions;
+
+      // Find teacher absence events
+      const teacherAbsences = [];
+      for (const dayEvents of calendar) {
+        if (!Array.isArray(dayEvents)) continue;
+
+        for (const event of dayEvents) {
+          if (event.category === 'Nieobecność nauczyciela' ||
+              (event.title && event.title.includes('Nieobecność:Nauczyciel'))) {
+            const eventDate = event.day || event.date;
+            teacherAbsences.push({
+              date: eventDate,
+              teacher: this.extractTeacherName(event.title)
+            });
+            logger.info(`Found teacher absence: ${event.title} on ${eventDate}`);
+          }
+        }
+      }
+
+      // Match teacher absences to lessons in the timetable
+      const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+      for (const absence of teacherAbsences) {
+        const absenceDate = new Date(absence.date);
+        const dayOfWeek = absenceDate.getDay();
+        const dayName = dayNames[dayOfWeek];
+        const dateStr = absenceDate.toISOString().split('T')[0];
+
+        const dayLessons = timetableData.table[dayName];
+        if (!Array.isArray(dayLessons)) continue;
+
+        // Find lessons taught by this teacher
+        logger.info(`Checking ${dayName} lessons for teacher: ${absence.teacher}`);
+        dayLessons.forEach((lesson, idx) => {
+          if (lesson && lesson.teacher) {
+            const lessonTeacher = lesson.teacher.toLowerCase().trim();
+            const absentTeacher = absence.teacher.toLowerCase().trim();
+
+            logger.info(`  Lesson ${idx + 1}: ${lesson.subject} - Teacher: "${lesson.teacher}" vs Absent: "${absence.teacher}"`);
+
+            // Check if teachers match (handle both "First Last" and "Last First" formats)
+            if (this.teachersMatch(lessonTeacher, absentTeacher)) {
+              const lessonNo = idx + 1;
+              const key = `${dateStr}-${lessonNo}`;
+              substitutions.set(key, true);
+              logger.info(`Matched absence to lesson: ${key} - ${lesson.subject} (${lesson.teacher})`);
+            }
+          }
+        });
+      }
+    } catch (error) {
+      logger.warn(`Failed to detect substitutions from calendar: ${error.message}`);
+    }
+
+    return substitutions;
+  }
+
+  extractTeacherName(title) {
+    // Extract teacher name from "Nieobecność:Nauczyciel: FirstName LastName"
+    const match = title.match(/Nauczyciel:\s*(.+)$/);
+    return match ? match[1].trim() : '';
+  }
+
+  teachersMatch(teacher1, teacher2) {
+    // Normalize and compare teacher names
+    const normalize = (name) => {
+      return name
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+    };
+
+    const name1 = normalize(teacher1);
+    const name2 = normalize(teacher2);
+
+    // Direct match
+    if (name1 === name2) return true;
+
+    // Check if one contains the other (handles "Last First" vs "First Last")
+    const parts1 = name1.split(' ');
+    const parts2 = name2.split(' ');
+
+    // Check if last names match
+    if (parts1.length >= 2 && parts2.length >= 2) {
+      // Compare last names (could be first or last in the string)
+      return parts1.some(p1 => parts2.some(p2 => p1 === p2 && p1.length > 3));
+    }
+
+    return false;
+  }
+
+  applyCalendarSubstitutions(timetableData, calendarSubstitutions) {
+    if (!timetableData || !timetableData.table) return timetableData;
+
+    logger.info(`Applying ${calendarSubstitutions.size} calendar-based substitutions`);
+
+    // Calculate the start of the current week (Monday)
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - daysFromMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    for (const [day, lessons] of Object.entries(timetableData.table)) {
+      const dayIndex = dayNames.indexOf(day);
+      if (dayIndex === -1) continue;
+
+      const dateForDay = new Date(monday);
+      dateForDay.setDate(monday.getDate() + dayIndex);
+      const dateStr = dateForDay.toISOString().split('T')[0];
+
+      lessons.forEach((lesson, idx) => {
+        if (lesson) {
+          const lessonNo = idx + 1;
+          const key = `${dateStr}-${lessonNo}`;
+
+          lesson.substitution = calendarSubstitutions.has(key);
+          lesson.cancelled = false;
+
+          if (lesson.substitution) {
+            logger.info(`Applied calendar substitution to ${key}: ${lesson.subject || 'Unknown'}`);
+          }
         }
       });
     }

@@ -15,10 +15,10 @@ async function main() {
 
   // Determine what to run based on time
   const isScheduleTime =
-    currentHour === 16 || // 16:00 Mon-Fri - tomorrow's timetable
+    (currentHour === 16 && currentDay >= 1 && currentDay <= 4) || // 16:00 Mon-Thu only (skip Friday)
     (currentHour === 17 && currentDay === 0); // 17:00 Sunday - tomorrow's timetable (Monday)
   const isReminderTime =
-    (currentHour === 14 && currentMinute === 30 && currentDay >= 1 && currentDay <= 5) || // 14:30 Mon-Fri
+    (currentHour === 14 && currentMinute === 30 && currentDay >= 1 && currentDay <= 4) || // 14:30 Mon-Thu (skip Friday)
     (currentHour === 9 && currentMinute === 0 && currentDay === 0); // 09:00 Sunday
 
   // Always check for updates

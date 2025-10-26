@@ -104,8 +104,8 @@ tail -f logs/stderr.log
 | 10:00 | Morning check (grades, messages, events) |
 | 11:30 | Mid-morning check |
 | 13:00 | Midday check |
-| 14:30 | **Upcoming tests reminder** + updates check |
-| 16:00 | **Tomorrow's lesson plan** + updates check |
+| 14:30 | **Upcoming tests reminder** (Mon-Thu only) + updates check |
+| 16:00 | **Tomorrow's lesson plan** (Mon-Thu only) + updates check |
 | 19:00 | Evening check |
 
 **Weekend Schedule (Saturday-Sunday):**
