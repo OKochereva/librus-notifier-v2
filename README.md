@@ -4,19 +4,19 @@ Automated Librus Synergia monitor running on your Mac. Get instant Telegram noti
 
 ## ✨ Features
 
-- ✅ Runs by schedule (Monday-Friday 10:00, 11:30, 13:00, 14:30, 16:00, 19:00; Saturday-Sunday 11:00, 18:00)
+- ✅ Runs by schedule (Monday-Friday 10:00, 11:30, 13:00, 14:30, 16:00, 19:00; Saturday-Sunday 11:00, 19:00)
 - ✅ Multi-account support (Illia & Kostia)
-- ✅ Tomorrow's lesson plan at 16:00
-- ✅ Upcoming tests reminder at 14:30 (Mon-Fri) and 11:00 (Sunday)
-- ✅ **Substitution detection with 🔄 emoji for replaced lessons**
+- ✅ Tomorrow's lesson plan at 16:00 (Mon-Thu) and 19:00 (Sunday)
+- ✅ Upcoming tests reminder at 14:30 (Mon-Thu) and 11:00 (Sunday)
+- ✅ **Substitution detection with 🔄 emoji** (from HTML timetable + calendar API)
 - ✅ **Cancellation detection with ❌ emoji and prominent alerts**
-- ✅ Tracks: grades, messages, announcements, calendar events, attendance
-- ✅ Full message content
+- ✅ Tracks: grades, messages (inbox + notes), announcements, calendar events, attendance
+- ✅ Full message content with HTML formatting
 - ✅ Smart change detection (no duplicates)
 - ✅ Silent when no updates
-- ✅ Telegram notifications
+- ✅ Telegram notifications with retry logic
 - ✅ Error alerts for blocking issues
-- ✅ Automatic retry logic
+- ✅ Test descriptions in upcoming events reminder
 
 ---
 
