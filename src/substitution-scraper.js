@@ -201,13 +201,11 @@ class SubstitutionScraper {
 
     logger.info(`Enhancing timetable with ${substitutionKeys.size} substitutions and ${cancellationKeys.size} cancellations`);
 
-    // Calculate the start of the current week (Monday)
+    // Calculate the start of the current week (Monday) using UTC to avoid timezone issues
     const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const dayOfWeek = now.getUTCDay(); // 0 = Sunday, 1 = Monday, etc.
     const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Sunday is 6 days after Monday
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - daysFromMonday);
-    monday.setHours(0, 0, 0, 0);
+    const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - daysFromMonday));
 
     const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -216,8 +214,7 @@ class SubstitutionScraper {
       const dayIndex = dayNames.indexOf(day);
       if (dayIndex === -1) continue; // Skip if not a recognized day
 
-      const dateForDay = new Date(monday);
-      dateForDay.setDate(monday.getDate() + dayIndex);
+      const dateForDay = new Date(Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate() + dayIndex));
       const dateStr = dateForDay.toISOString().split('T')[0]; // Format: "2025-10-27"
 
       lessons.forEach((lesson, idx) => {
@@ -363,13 +360,11 @@ class SubstitutionScraper {
 
     logger.info(`Applying ${calendarSubstitutions.size} calendar-based substitutions`);
 
-    // Calculate the start of the current week (Monday)
+    // Calculate the start of the current week (Monday) using UTC to avoid timezone issues
     const now = new Date();
-    const dayOfWeek = now.getDay();
+    const dayOfWeek = now.getUTCDay();
     const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - daysFromMonday);
-    monday.setHours(0, 0, 0, 0);
+    const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - daysFromMonday));
 
     const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -377,8 +372,7 @@ class SubstitutionScraper {
       const dayIndex = dayNames.indexOf(day);
       if (dayIndex === -1) continue;
 
-      const dateForDay = new Date(monday);
-      dateForDay.setDate(monday.getDate() + dayIndex);
+      const dateForDay = new Date(Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate() + dayIndex));
       const dateStr = dateForDay.toISOString().split('T')[0];
 
       lessons.forEach((lesson, idx) => {
