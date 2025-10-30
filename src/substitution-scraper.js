@@ -3,14 +3,14 @@ const logger = require('./logger');
 class SubstitutionScraper {
   async detectSubstitutions(client, timetableData) {
   try {
-    // First, check calendar for teacher absences (for future dates)
-    const calendarSubstitutions = await this.detectSubstitutionsFromCalendar(client, timetableData);
+    // Note: Calendar API shows teacher absences but not specific lesson times,
+    // so we can't reliably match them to specific lessons. HTML parsing is more accurate.
 
     const jar = client.cookie;
 
     if (!jar) {
-      logger.warn('No cookie jar found, using calendar-only substitutions');
-      return this.applyCalendarSubstitutions(timetableData, calendarSubstitutions);
+      logger.warn('No cookie jar found');
+      return this.markAllNormal(timetableData);
     }
 
     // Debug: inspect the jar object itself
@@ -98,15 +98,9 @@ class SubstitutionScraper {
 
     const htmlDetections = this.parseHTML(html);
 
-    // Merge calendar-based substitutions with HTML detections
-    const mergedDetections = {
-      substitutions: new Set([...htmlDetections.substitutions, ...calendarSubstitutions.keys()]),
-      cancellations: htmlDetections.cancellations
-    };
+    logger.info(`HTML detections: ${htmlDetections.substitutions.size} substitutions, ${htmlDetections.cancellations.size} cancellations`);
 
-    logger.info(`Merged detections: ${mergedDetections.substitutions.size} substitutions (${calendarSubstitutions.size} from calendar), ${mergedDetections.cancellations.size} cancellations`);
-
-    return this.enhanceTimetable(timetableData, mergedDetections);
+    return this.enhanceTimetable(timetableData, htmlDetections);
   } catch (error) {
     logger.warn(`Substitution detection failed: ${error.message}`);
     logger.warn(`Stack: ${error.stack}`);
@@ -219,9 +213,10 @@ class SubstitutionScraper {
 
       lessons.forEach((lesson, idx) => {
         if (lesson) {
-          // Use idx + 1 because HTML lesson numbers are 1-based, but array indices are 0-based
-          const lessonNo = idx + 1;
-          const key = `${dateStr}-${lessonNo}`;
+          // HTML lesson numbers correspond to array indices (both start from 0)
+          // Array index 0 = lesson at 07:35 (HTML lesson 0, not displayed)
+          // Array index 1 = lesson at 08:30 (HTML lesson 1, displayed as "Lesson 1")
+          const key = `${dateStr}-${idx}`;
           const hasSubstitution = substitutionKeys.has(key);
           const hasCancellation = cancellationKeys.has(key);
 
@@ -302,12 +297,12 @@ class SubstitutionScraper {
             const lessonTeacher = lesson.teacher.toLowerCase().trim();
             const absentTeacher = absence.teacher.toLowerCase().trim();
 
-            logger.info(`  Lesson ${idx + 1}: ${lesson.subject} - Teacher: "${lesson.teacher}" vs Absent: "${absence.teacher}"`);
+            logger.info(`  Array index ${idx}: ${lesson.subject} - Teacher: "${lesson.teacher}" vs Absent: "${absence.teacher}"`);
 
             // Check if teachers match (handle both "First Last" and "Last First" formats)
             if (this.teachersMatch(lessonTeacher, absentTeacher)) {
-              const lessonNo = idx + 1;
-              const key = `${dateStr}-${lessonNo}`;
+              // Use array index directly (matches HTML lesson number)
+              const key = `${dateStr}-${idx}`;
               substitutions.set(key, true);
               logger.info(`Matched absence to lesson: ${key} - ${lesson.subject} (${lesson.teacher})`);
             }
@@ -377,8 +372,8 @@ class SubstitutionScraper {
 
       lessons.forEach((lesson, idx) => {
         if (lesson) {
-          const lessonNo = idx + 1;
-          const key = `${dateStr}-${lessonNo}`;
+          // HTML lesson numbers correspond to array indices
+          const key = `${dateStr}-${idx}`;
 
           lesson.substitution = calendarSubstitutions.has(key);
           lesson.cancelled = false;
