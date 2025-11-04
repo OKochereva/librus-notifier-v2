@@ -18,8 +18,8 @@ async function main() {
     (currentHour === 16 && currentDay >= 1 && currentDay <= 4) || // 16:00 Mon-Thu only (skip Friday)
     (currentHour === 17 && currentDay === 0); // 17:00 Sunday - tomorrow's timetable (Monday)
   const isReminderTime =
-    (currentHour === 14 && currentMinute === 30 && currentDay >= 1 && currentDay <= 4) || // 14:30 Mon-Thu (skip Friday)
-    (currentHour === 9 && currentMinute === 0 && currentDay === 0); // 09:00 Sunday
+    (currentHour === 14 && currentMinute >= 0 && currentMinute <= 30 && currentDay >= 1 && currentDay <= 4) || // Around 14:30 Mon-Thu (skip Friday)
+    (currentHour === 9 && currentMinute >= 0 && currentMinute <= 30 && currentDay === 0); // Around 09:00 Sunday
 
   // Always check for updates
   await checkForUpdates();
@@ -37,6 +37,24 @@ async function main() {
 
 async function sendUpcomingEventsReminder() {
   logger.info('=== Sending upcoming events reminder ===');
+
+  // Check if reminder was already sent today
+  const fs = require('fs');
+  const path = require('path');
+  const today = new Date().toDateString();
+  const reminderStatePath = path.join(__dirname, '..', 'state', 'daily-reminder.json');
+
+  try {
+    if (fs.existsSync(reminderStatePath)) {
+      const reminderState = JSON.parse(fs.readFileSync(reminderStatePath, 'utf8'));
+      if (reminderState.lastSentDate === today) {
+        logger.info('Upcoming events reminder already sent today, skipping');
+        return;
+      }
+    }
+  } catch (error) {
+    logger.warn('Error reading reminder state:', error.message);
+  }
 
   const notifier = new Notifier(config);
   const accountsWithCalendar = [];
@@ -64,6 +82,14 @@ async function sendUpcomingEventsReminder() {
     try {
       await notifier.send(reminderReport);
       logger.info('Upcoming events reminder sent successfully');
+
+      // Save reminder state to prevent duplicates
+      try {
+        fs.writeFileSync(reminderStatePath, JSON.stringify({ lastSentDate: today }));
+        logger.info('Reminder state saved');
+      } catch (error) {
+        logger.warn('Error saving reminder state:', error.message);
+      }
     } catch (error) {
       logger.error(`Failed to send upcoming events reminder: ${error.message}`);
     }
