@@ -19,7 +19,7 @@ async function main() {
     (currentHour === 17 && currentDay === 0); // 17:00 Sunday - tomorrow's timetable (Monday)
   const isReminderTime =
     (currentHour === 14 && currentMinute >= 0 && currentMinute <= 30 && currentDay >= 1 && currentDay <= 4) || // Around 14:30 Mon-Thu (skip Friday)
-    (currentHour === 10 && currentMinute >= 0 && currentMinute <= 30 && currentDay === 0); // Around 10:00 UTC (11:00 CET) Sunday
+    (currentHour === 10 && currentMinute >= 0 && currentMinute <= 30 && currentDay === 0); // Around 10:00 CET Sunday (actual local execution time)
 
   // Always check for updates
   await checkForUpdates();
