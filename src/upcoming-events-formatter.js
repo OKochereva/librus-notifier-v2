@@ -3,12 +3,14 @@ class UpcomingEventsFormatter {
     const now = new Date();
 
     // Create date range as simple date strings (YYYY-MM-DD) to avoid timezone issues
-    // Start from today (inclusive)
-    const startDateStr = this.formatDateToString(now);
+    // Start from tomorrow (not today - we want upcoming events)
+    const startDateObj = new Date(now);
+    startDateObj.setDate(startDateObj.getDate() + 1);
+    const startDateStr = this.formatDateToString(startDateObj);
 
-    // End date is daysAhead from now (inclusive)
-    const endDateObj = new Date(now);
-    endDateObj.setDate(endDateObj.getDate() + daysAhead);
+    // End date is daysAhead from tomorrow (inclusive)
+    const endDateObj = new Date(startDateObj);
+    endDateObj.setDate(endDateObj.getDate() + (daysAhead - 1));
     const endDateStr = this.formatDateToString(endDateObj);
 
     let report = `📝 *NADCHODZĄCE SPRAWDZIANY I KARTKÓWKI*\n`;
