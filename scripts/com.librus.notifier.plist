@@ -6,6 +6,9 @@
     <key>Label</key>
     <string>com.librus.notifier</string>
     
+    <key>WorkingDirectory</key>
+    <string>/Users/olena/Projects/librus</string>
+    
         <key>ProgramArguments</key>
     <array>
         <string>/usr/local/bin/node</string>
