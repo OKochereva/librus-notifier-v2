@@ -18,7 +18,7 @@
     "axios": "^1.12.2",
     "axios-cookiejar-support": "^6.0.4",
     "dotenv": "^16.3.1",
-    "librus-api": "^2.2.0",
+    "librus-api": "^2.15.3",
     "node-telegram-bot-api": "^0.64.0"
   }
 }

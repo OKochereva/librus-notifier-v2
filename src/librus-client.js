@@ -1,4 +1,6 @@
 const Librus = require('librus-api');
+const { wrapper } = require('axios-cookiejar-support');
+const axios = require('axios');
 const logger = require('./logger');
 const SubstitutionScraper = require('./substitution-scraper');
 
@@ -9,6 +11,52 @@ class LibrusClient {
     this.client = new Librus();
   }
 
+  // Generate X-Baner anti-bot header required by Librus OAuth since ~March 2026
+  _generateXBaner() {
+    const turnips = Date.now().toString().split('').map(l => String.fromCharCode(l.charCodeAt(0) + 20)).join('');
+    const preTurnips = Math.random().toString().split('').map(l => String.fromCharCode(l.charCodeAt(0) + 20)).join('');
+    return preTurnips + '_' + turnips;
+  }
+
+  async _authorizeWithNewFlow() {
+    // Wait for the library's caller to be initialized (async in v2.15.3)
+    for (let i = 0; i < 20 && !this.client.caller; i++) {
+      await this.sleep(100);
+    }
+    if (!this.client.caller) {
+      throw new Error('Library caller not initialized');
+    }
+
+    const caller = this.client.caller;
+
+    // Step 1: Start from portalRodzina — this sets oauth_state cookie on api.librus.pl
+    await caller.get(`https://synergia.librus.pl/loguj/portalRodzina?v=${Date.now()}`);
+
+    // Step 2: POST credentials with X-Baner anti-bot header
+    await caller.post(
+      'https://api.librus.pl/OAuth/Authorization?client_id=46',
+      new URLSearchParams({ action: 'login', login: this.username, pass: this.password }),
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Baner': this._generateXBaner(),
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      }
+    );
+
+    // Step 3: Complete 2FA flow — redirects through PerformLogin → Grant →
+    //         synergia/portalRodzina?code=...&state=... which sets oauth_token
+    await caller.get('https://api.librus.pl/OAuth/Authorization/2FA?client_id=46');
+
+    // Verify oauth_token was set
+    const cookies = await this.client.cookie.getCookies('https://synergia.librus.pl');
+    const hasOauthToken = cookies.some(c => c.key === 'oauth_token');
+    if (!hasOauthToken) {
+      throw new Error('Login failed: oauth_token not set after auth flow');
+    }
+  }
+
   async login() {
     const maxRetries = 2;
     let lastError;
@@ -16,13 +64,13 @@ class LibrusClient {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         logger.info(`Login attempt ${attempt}/${maxRetries} for user ${this.username}`);
-        await this.client.authorize(this.username, this.password);
+        await this._authorizeWithNewFlow();
         logger.info(`Login successful for ${this.username}`);
         return true;
       } catch (error) {
         lastError = error;
         logger.warn(`Login attempt ${attempt} failed: ${error.message}`);
-        
+
         if (attempt < maxRetries) {
           await this.sleep(30000); // Wait 30s before retry
         }
