@@ -18,8 +18,8 @@ async function main() {
     (currentHour === 16 && currentDay >= 1 && currentDay <= 4) || // 16:00 Mon-Thu only (skip Friday)
     (currentHour === 17 && currentDay === 0); // 17:00 Sunday - tomorrow's timetable (Monday)
   const isReminderTime =
-    (currentHour === 14 && currentMinute >= 0 && currentMinute <= 30 && currentDay >= 1 && currentDay <= 4) || // Around 14:30 Mon-Thu (skip Friday)
-    (currentHour === 10 && currentMinute >= 0 && currentMinute <= 30 && currentDay === 0); // Around 10:00 CET Sunday (actual local execution time)
+    (currentHour === 14 && currentDay >= 1 && currentDay <= 4) || // 14:xx Mon-Thu (skip Friday) - dedup prevents double-sends
+    (currentHour === 10 && currentDay === 0); // 10:xx Sunday
 
   // Always check for updates
   await checkForUpdates();
